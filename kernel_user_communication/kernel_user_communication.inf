@@ -1,0 +1,77 @@
+;
+; kernel_user_communication.inf
+;
+
+[Version]
+Signature="$WINDOWS NT$"
+Class=System ; TODO: specify appropriate Class
+ClassGuid={4d36e97d-e325-11ce-bfc1-08002be10318} ; TODO: specify appropriate ClassGuid
+Provider=%ManufacturerName%
+CatalogFile=kernel_user_communication.cat
+DriverVer= ; TODO: set DriverVer in stampinf property pages
+PnpLockdown=1
+
+[DestinationDirs]
+DefaultDestDir = 12
+kernel_user_communication_Device_CoInstaller_CopyFiles = 11
+
+[SourceDisksNames]
+1 = %DiskName%,,,""
+
+[SourceDisksFiles]
+kernel_user_communication.sys  = 1,,
+WdfCoInstaller$KMDFCOINSTALLERVERSION$.dll=1 ; make sure the number matches with SourceDisksNames
+
+;*****************************************
+; Install Section
+;*****************************************
+
+[Manufacturer]
+%ManufacturerName%=Standard,NT$ARCH$
+
+[Standard.NT$ARCH$]
+%kernel_user_communication.DeviceDesc%=kernel_user_communication_Device, Root\kernel_user_communication ; TODO: edit hw-id
+
+[kernel_user_communication_Device.NT]
+CopyFiles=Drivers_Dir
+
+[Drivers_Dir]
+kernel_user_communication.sys
+
+;-------------- Service installation
+[kernel_user_communication_Device.NT.Services]
+AddService = kernel_user_communication,%SPSVCINST_ASSOCSERVICE%, kernel_user_communication_Service_Inst
+
+; -------------- kernel_user_communication driver install sections
+[kernel_user_communication_Service_Inst]
+DisplayName    = %kernel_user_communication.SVCDESC%
+ServiceType    = 1               ; SERVICE_KERNEL_DRIVER
+StartType      = 3               ; SERVICE_DEMAND_START
+ErrorControl   = 1               ; SERVICE_ERROR_NORMAL
+ServiceBinary  = %12%\kernel_user_communication.sys
+
+;
+;--- kernel_user_communication_Device Coinstaller installation ------
+;
+
+[kernel_user_communication_Device.NT.CoInstallers]
+AddReg=kernel_user_communication_Device_CoInstaller_AddReg
+CopyFiles=kernel_user_communication_Device_CoInstaller_CopyFiles
+
+[kernel_user_communication_Device_CoInstaller_AddReg]
+HKR,,CoInstallers32,0x00010000, "WdfCoInstaller$KMDFCOINSTALLERVERSION$.dll,WdfCoInstaller"
+
+[kernel_user_communication_Device_CoInstaller_CopyFiles]
+WdfCoInstaller$KMDFCOINSTALLERVERSION$.dll
+
+[kernel_user_communication_Device.NT.Wdf]
+KmdfService =  kernel_user_communication, kernel_user_communication_wdfsect
+[kernel_user_communication_wdfsect]
+KmdfLibraryVersion = $KMDFVERSION$
+
+[Strings]
+SPSVCINST_ASSOCSERVICE= 0x00000002
+ManufacturerName="<Your manufacturer name>" ;TODO: Replace with your manufacturer name
+DiskName = "kernel_user_communication Installation Disk"
+kernel_user_communication.DeviceDesc = "kernel_user_communication Device"
+kernel_user_communication.SVCDESC = "kernel_user_communication Service"

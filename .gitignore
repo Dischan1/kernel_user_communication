@@ -30,3 +30,6 @@
 *.exe
 *.out
 *.app
+communicator/x64
+kernel_user_communication/x64
+x64
